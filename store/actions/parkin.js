@@ -1,5 +1,7 @@
 const SIGNUP = 'SIGNUP';
 const SIGNIN = 'SIGNIN';
+const AUTHENTICATE = 'AUTHENTICATE'
+
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
 const { setItem, getItem } = useAsyncStorage('@userData')
@@ -118,4 +120,8 @@ const setUserToDevice = (userInfo) => {
     })
     console.log('string userdata', userData);
     setItem(userData);
+}
+
+export const authenticate = (userData) => {
+    return{ type: AUTHENTICATE, user: userData}
 }

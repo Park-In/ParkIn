@@ -1,22 +1,56 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, { useEffect } from 'react';
+import {
+    View,
+    ActivityIndicator,
+    StyleSheet,
+} from 'react-native';
+import { useDispatch } from 'react-redux';
+import { useAsyncStorage } from '@react-native-community/async-storage';
 
-function StartUp(props) {
-    return(
-        <View style={styles.container}>
-            <Text>
-                this is the startup screen!
-            </Text>
+import * as parkinActions from '../store/actions/parkin.js';
+import { useNavigation } from '@react-navigation/native';
+
+const StartupScreen = props => {
+    const dispatch = useDispatch();
+    const { setItem, getItem } = useAsyncStorage('@userData')
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        const tryLogin = async () => {
+            const userData = await getItem();
+            if (!userData) {
+                navigation.navigate('Auth');
+                return;
+            }
+            const transformedData = JSON.parse(userData);
+            const { token, id, tokenExpiry, } = transformedData;
+            const expirationDate = new Date(tokenExpiry);
+
+            if (expirationDate <= new Date() || !token || !id) {
+                navigation.navigate('Auth');
+                return;
+            }
+
+            dispatch(parkinActions.authenticate(transformedData));
+            navigation.navigate('Map');
+        };
+
+        tryLogin();
+    }, [dispatch]);
+
+    return (
+        <View style={styles.screen}>
+            <ActivityIndicator size="large" color='blue' />
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
-    container:{
-    flex:1,
-    justifyContent:'center',
-    alignItems:'center',
-}
-})
+    screen: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
+});
 
-export default StartUp;
+export default StartupScreen;

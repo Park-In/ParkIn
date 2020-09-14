@@ -8,7 +8,7 @@ const initialState = {
 
 export default (state = initialState, action) => {
     switch (action.type) {
-  
+
         case 'SIGNUP':
             return ({
                 ...state,
@@ -20,6 +20,16 @@ export default (state = initialState, action) => {
                 }
             })
         case 'SIGNIN':
+            return ({
+                ...state,
+                currentUser: {
+                    id: action.user.id,
+                    token: action.user.token,
+                    tokenExpiry: action.user.tokenExpiry,
+                    location: action.user.location
+                }
+            })
+        case 'AUTHENTICATE':
             return ({
                 ...state,
                 currentUser: {

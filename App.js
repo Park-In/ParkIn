@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import MyDrawer from './navigation/parkin.js';
 import 'react-native-gesture-handler';
+
+import * as registerForPushNotificationsAsync from './helper/notifications.js';
 
 import { createStore, combineReducers, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
@@ -17,6 +19,11 @@ const rootReducer = combineReducers({
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk))
 
 export default function App() {
+
+  useEffect(() =>{
+    registerForPushNotificationsAsync.registerForPushNotificationsAsync();
+  });
+
   return (
      <Provider store={store}>
       <NavigationContainer>

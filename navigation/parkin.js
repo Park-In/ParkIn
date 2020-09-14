@@ -21,7 +21,7 @@ function MyDrawer(props) {
     return (
 
         <Drawer.Navigator >
-            {/* <Drawer.Screen name='Startup' component={StartupScreen} /> */}
+            <Drawer.Screen name='Startup' component={StartupScreen} />
             <Drawer.Screen name='Auth' component={AuthScreen} />
             <Drawer.Screen name='Map' component={MapScreen} />
             <Drawer.Screen name='Profike' component={ProfileScreen} />

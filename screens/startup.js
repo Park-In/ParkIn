@@ -1,11 +1,11 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-function Map(props) {
+function StartUp(props) {
     return(
         <View style={styles.container}>
             <Text>
-            this is the map screen!
+                this is the startup screen!
             </Text>
         </View>
     )
@@ -13,10 +13,10 @@ function Map(props) {
 
 const styles = StyleSheet.create({
     container:{
-        flex:1,
-        justifyContent:'center',
-        alignItems:'center',
-    }
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center',
+}
 })
 
-export default Map;
+export default StartUp;

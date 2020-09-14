@@ -3,256 +3,25 @@ import { StyleSheet,
   View,
   Text,
   Image,
-   Dimensions} from 'react-native';
+  Dimensions} from 'react-native';
 import MapView , {Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import MapViewDirections from 'react-native-maps-directions';
+import mapStyle from '../helper/mapStyle'
 const { width, height } = Dimensions.get('window');
-const test = [
-    {
-      "elementType": "geometry",
-      "stylers": [
-        {
-          "color": "#1d2c4d"
-        }
-      ]
-    },
-    {
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#8ec3b9"
-        }
-      ]
-    },
-    {
-      "elementType": "labels.text.stroke",
-      "stylers": [
-        {
-          "color": "#1a3646"
-        }
-      ]
-    },
-    {
-      "featureType": "administrative.country",
-      "elementType": "geometry.stroke",
-      "stylers": [
-        {
-          "color": "#4b6878"
-        }
-      ]
-    },
-    {
-      "featureType": "administrative.land_parcel",
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#64779e"
-        }
-      ]
-    },
-    {
-      "featureType": "administrative.province",
-      "elementType": "geometry.stroke",
-      "stylers": [
-        {
-          "color": "#4b6878"
-        }
-      ]
-    },
-    {
-      "featureType": "landscape.man_made",
-      "elementType": "geometry.stroke",
-      "stylers": [
-        {
-          "color": "#334e87"
-        }
-      ]
-    },
-    {
-      "featureType": "landscape.natural",
-      "elementType": "geometry",
-      "stylers": [
-        {
-          "color": "#023e58"
-        }
-      ]
-    },
-    {
-      "featureType": "poi",
-      "elementType": "geometry",
-      "stylers": [
-        {
-          "color": "#283d6a"
-        }
-      ]
-    },
-    {
-      "featureType": "poi",
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#6f9ba5"
-        }
-      ]
-    },
-    {
-      "featureType": "poi",
-      "elementType": "labels.text.stroke",
-      "stylers": [
-        {
-          "color": "#1d2c4d"
-        }
-      ]
-    },
-    {
-      "featureType": "poi.park",
-      "elementType": "geometry.fill",
-      "stylers": [
-        {
-          "color": "#023e58"
-        }
-      ]
-    },
-    {
-      "featureType": "poi.park",
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#3C7680"
-        }
-      ]
-    },
-    {
-      "featureType": "road",
-      "elementType": "geometry",
-      "stylers": [
-        {
-          "color": "#304a7d"
-        }
-      ]
-    },
-    {
-      "featureType": "road",
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#98a5be"
-        }
-      ]
-    },
-    {
-      "featureType": "road",
-      "elementType": "labels.text.stroke",
-      "stylers": [
-        {
-          "color": "#1d2c4d"
-        }
-      ]
-    },
-    {
-      "featureType": "road.highway",
-      "elementType": "geometry",
-      "stylers": [
-        {
-          "color": "#2c6675"
-        }
-      ]
-    },
-    {
-      "featureType": "road.highway",
-      "elementType": "geometry.stroke",
-      "stylers": [
-        {
-          "color": "#255763"
-        }
-      ]
-    },
-    {
-      "featureType": "road.highway",
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#b0d5ce"
-        }
-      ]
-    },
-    {
-      "featureType": "road.highway",
-      "elementType": "labels.text.stroke",
-      "stylers": [
-        {
-          "color": "#023e58"
-        }
-      ]
-    },
-    {
-      "featureType": "transit",
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#98a5be"
-        }
-      ]
-    },
-    {
-      "featureType": "transit",
-      "elementType": "labels.text.stroke",
-      "stylers": [
-        {
-          "color": "#1d2c4d"
-        }
-      ]
-    },
-    {
-      "featureType": "transit.line",
-      "elementType": "geometry.fill",
-      "stylers": [
-        {
-          "color": "#283d6a"
-        }
-      ]
-    },
-    {
-      "featureType": "transit.station",
-      "elementType": "geometry",
-      "stylers": [
-        {
-          "color": "#3a4762"
-        }
-      ]
-    },
-    {
-      "featureType": "water",
-      "elementType": "geometry",
-      "stylers": [
-        {
-          "color": "#0e1626"
-        }
-      ]
-    },
-    {
-      "featureType": "water",
-      "elementType": "labels.text.fill",
-      "stylers": [
-        {
-          "color": "#4e6d70"
-        }
-      ]
-    }
-  ]
+
 export default MapRouting = () => {
   const [region, setRegion] = useState(null)
   const [distance, setDistance] = useState({})
+  const [showInfo, setShowInfo] = useState(false)
+  let mapview = null;
 useEffect(()=>{
   (async ()=>{
     let {status} =  await Permissions.askAsync(Permissions.LOCATION);
     if(status !== 'granted' )
        console.warn('permissions denaid')
-  
     let location = await Location.getCurrentPositionAsync({enableHighAccuracy:true});
-    // console.warn(location.coords) 
     setRegion ( {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
@@ -261,17 +30,13 @@ useEffect(()=>{
     })
   })() 
 },[])
-
-  let mapview = null;
-
-  // const [doneState, setDone] = useState(false);
   return (
     <View style={styles.todoItem}>
     <MapView
-    //   style={StyleSheet.absoluteFill}
-    // ref={(c)=>console.warn(JSON.stringify(c))}
-    // onPress={(e)=>console.warn(JSON.stringify(e))}
-    // userLocationAnnotationTitle='hello'
+    onPress={(e)=>{
+        if(Object.keys(distance))
+          setShowInfo(!showInfo)
+    }}
     ref={c => mapview = c}
     loadingEnabled={true}
     showsMyLocationButton={true}
@@ -280,7 +45,7 @@ useEffect(()=>{
     userLocationPriority='balanced'
     provider='google'
     mapType='mutedStandard'
-    customMapStyle={test}
+    // customMapStyle={mapStyle}
       showsUserLocation={true}
       showsCompass={true}
       rotateEnabled={false}
@@ -296,12 +61,12 @@ useEffect(()=>{
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,}}
     onDragEnd={(e) => console.warn({ x: e.nativeEvent.coordinate })}
+
   />
-  {(region &&<Marker coordinate={region}>
+  {/* {(region &&<Marker coordinate={region}>
  <Image source={require('../assets/car3.png')}
   style={{width:50,height:50}}   />
- {/* </View> */}
-</Marker>)}
+</Marker>)} */}
    <MapViewDirections
    optimizeWaypoints={true}
     origin={region}
@@ -313,9 +78,6 @@ useEffect(()=>{
     }}
     onReady={result => {
         setDistance(result)
-        // console.warn(`Distance: ${result.distance} km`)
-        // console.warn(`Duration: ${result.duration} min.`)
-
         mapview.fitToCoordinates(result.coordinates, {
           edgePadding: {
             right: (width / 20),
@@ -326,14 +88,14 @@ useEffect(()=>{
         });
       }}
     onError={(err)=>console.warn(err)}
-    destination={{ latitude: 32.1450093,
-      longitude:35.9712935,
+    destination={{ latitude: 31.891083,
+      longitude:35.860195,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,}}
     apikey={'AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE'}
   />
 </MapView>
-<Text style={{position:'absolute',bottom:15,backgroundColor:'white',width,}}>{`${distance.distance} KM will take ${distance.duration} min`}</Text>
+{(showInfo&&<Text style={{position:'absolute',bottom:15,backgroundColor:'white',width,}}>{`${distance.distance} KM will take ${distance.duration} min`}</Text>)}
     </View>
   );
 };
@@ -350,7 +112,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     alignItems: 'center',
-
   },
   todoText: {
     borderColor: '#afafaf',

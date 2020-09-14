@@ -23,13 +23,13 @@ export const registerForPushNotificationsAsync = async () => {
     alert('Must use physical device for Push Notifications');
   }
 
-  if (Platform.OS === 'android') {
-    Notifications.createChannelAndroidAsync('default', {
-      name: 'default',
-      sound: true,
-      priority: 'max',
-      vibrate: [0, 250, 250, 250],
-    });
-  }
+//   if (Platform.OS === 'android') {
+//     Notifications.createChannelAndroidAsync('default', {
+//       name: 'default',
+//       sound: true,
+//       priority: 'max',
+//       vibrate: [0, 250, 250, 250],
+//     });
+//   }
 };
  

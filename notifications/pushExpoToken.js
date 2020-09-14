@@ -30,5 +30,6 @@ const registerForPushNotificationsAsync = async () => {
       vibrate: [0, 250, 250, 250],
     });
   }
+  return token;
 };
 export {registerForPushNotificationsAsync};

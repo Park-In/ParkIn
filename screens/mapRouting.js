@@ -2,11 +2,13 @@ import React, {useState,useEffect} from 'react';
 import { StyleSheet,
   View,
   Text,
+  Image,
    Dimensions} from 'react-native';
 import MapView , {Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import MapViewDirections from 'react-native-maps-directions';
+const { width, height } = Dimensions.get('window');
 const test = [
     {
       "elementType": "geometry",
@@ -242,7 +244,7 @@ const test = [
   ]
 export default MapRouting = () => {
   const [region, setRegion] = useState(null)
-  
+  const [distance, setDistance] = useState({})
 useEffect(()=>{
   (async ()=>{
     let {status} =  await Permissions.askAsync(Permissions.LOCATION);
@@ -260,6 +262,8 @@ useEffect(()=>{
   })() 
 },[])
 
+  let mapview = null;
+
   // const [doneState, setDone] = useState(false);
   return (
     <View style={styles.todoItem}>
@@ -268,6 +272,7 @@ useEffect(()=>{
     // ref={(c)=>console.warn(JSON.stringify(c))}
     // onPress={(e)=>console.warn(JSON.stringify(e))}
     // userLocationAnnotationTitle='hello'
+    ref={c => mapview = c}
     loadingEnabled={true}
     showsMyLocationButton={true}
     followsUserLocation={true}
@@ -292,7 +297,13 @@ useEffect(()=>{
       longitudeDelta: 0.0421,}}
     onDragEnd={(e) => console.warn({ x: e.nativeEvent.coordinate })}
   />
+  {(region &&<Marker coordinate={region}>
+ <Image source={require('../assets/car3.png')}
+  style={{width:50,height:50}}   />
+ {/* </View> */}
+</Marker>)}
    <MapViewDirections
+   optimizeWaypoints={true}
     origin={region}
     mode='DRIVING'
     strokeWidth={3}
@@ -300,9 +311,20 @@ useEffect(()=>{
     onStart={(params)=>{
       console.warn(params)
     }}
-    onReady={(params)=>{
-      console.warn(`ready `,params);
-    }}
+    onReady={result => {
+        setDistance(result)
+        // console.warn(`Distance: ${result.distance} km`)
+        // console.warn(`Duration: ${result.duration} min.`)
+
+        mapview.fitToCoordinates(result.coordinates, {
+          edgePadding: {
+            right: (width / 20),
+            bottom: (height / 20),
+            left: (width / 20),
+            top: (height / 20),
+          }
+        });
+      }}
     onError={(err)=>console.warn(err)}
     destination={{ latitude: 32.1450093,
       longitude:35.9712935,
@@ -311,6 +333,7 @@ useEffect(()=>{
     apikey={'AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE'}
   />
 </MapView>
+<Text style={{position:'absolute',bottom:15,backgroundColor:'white',width,}}>{`${distance.distance} KM will take ${distance.duration} min`}</Text>
     </View>
   );
 };

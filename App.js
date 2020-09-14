@@ -10,9 +10,29 @@ export default function App() {
     
   });
 
-  async function sendPushNotification(expoPushToken) {
+  async function sendPushNotification(pushToken) {
     const message = {
       to: pushToken,
+      sound: 'default',
+      title: 'Original Title',
+      body: 'And here is the body!',
+      data: { data: 'goes here' },
+    };
+  
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+  }
+
+  async function sendPushNotification2() {
+    const message = {
+      to: '', // add the push token here ------------------------------//--------------
       sound: 'default',
       title: 'Original Title',
       body: 'And here is the body!',
@@ -32,10 +52,19 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
+
+
       <Button
-        title="Press to Send Notification"
+        title="Press to Send Notification to your device"
         onPress={async () => {
-          await sendPushNotification(expoPushToken);
+          await sendPushNotification(pushToken);
+        }}
+      />
+      
+      <Button
+        title="Press to Send Notification to custom device*******"
+        onPress={async () => {
+          await sendPushNotification2();
         }}
       />
       <StatusBar style="auto" />

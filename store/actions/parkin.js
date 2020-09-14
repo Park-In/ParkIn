@@ -1,6 +1,8 @@
 const SIGNUP = 'SIGNUP';
 const SIGNIN = 'SIGNIN';
-const AUTHENTICATE = 'AUTHENTICATE'
+const AUTHENTICATE = 'AUTHENTICATE';
+const FETCH_USERS = 'FETCH_USERS';
+
 
 
 import { useAsyncStorage } from '@react-native-community/async-storage';
@@ -124,4 +126,42 @@ const setUserToDevice = (userInfo) => {
 
 export const authenticate = (userData) => {
     return{ type: AUTHENTICATE, user: userData}
+}
+
+export const fetchUsers = () => {
+    return async dispatch => {
+        const getFromDbRes = await fetch('https://parkin-techathon.firebaseio.com/users.json');
+        if (!getFromDbRes.ok) {
+            const res = await getFromDbRes.json()
+            // console.log('signDbResponse', res);
+            throw new Error(res.error.errors[0].message)
+        }
+        const getResData = await getFromDbRes.json();
+        // console.log('inDataBase', getResData)
+        dispatch({ type: FETCH_USERS, users: getResData })
+
+    }
+}
+
+export const offerPark = (userData) => {
+    return async dispatch => {
+        const response = await fetch('https://parkin-techathon.firebaseio.com/parks.json'
+        ,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                parkOwner: userData.id,
+                location: userData.location,
+            })
+        })
+        if(!response.ok){
+            const res = await response.json()
+            throw new Error(res.error.errors[0].message)
+        }
+
+        const parkData = await response.json();
+        console.log('parkData', parkData)
+    }
 }

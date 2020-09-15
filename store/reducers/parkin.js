@@ -2,10 +2,13 @@ const initialState = {
     users: [{
 
     }],
-    parks:[{
+    parks: [{
 
     }],
     currentUser: {
+
+    },
+    searchGeo: {
 
     }
 };
@@ -60,19 +63,25 @@ export default (state = initialState, action) => {
                 ...state,
                 users: usersArr
             })
-            case 'FETCH_PARKS':
-                // console.log('action users', action.users);
-                let parksArr = [];
-                for (const park in action.parks) {
-                    parksArr.push({
-                        ownerId: action.parks[park].parkOwner,
-                        location: action.parks[park].location
-                    })
-                }
-                return ({
-                    ...state,
-                    parks: parksArr
+        case 'FETCH_PARKS':
+            // console.log('action users', action.users);
+            let parksArr = [];
+            for (const park in action.parks) {
+                parksArr.push({
+                    ownerId: action.parks[park].parkOwner,
+                    location: action.parks[park].location
                 })
+            }
+            return ({
+                ...state,
+                parks: parksArr
+            })
+        case 'FETCH_GEO':
+            // console.log('action users', action.users);
+            return ({
+                ...state,
+                searchGeo: action.searchGeo
+            })
         default:
             return state;
     }

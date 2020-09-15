@@ -73,7 +73,17 @@ function Map(props) {
     }
 
     const offerParkHandler = () => {
-        dispatch(parkinActions.offerPark(user))
+        // dispatch(parkinActions.offerPark(user))
+        dispatch(parkinActions.offerPark(
+            {
+                id: 'QroFr5yp7gYRxWwPr9rYXLBxvId2',
+                location:{
+                    lat: 31.975500,
+                    lng: 35.913930,
+                },
+            }
+        ))
+
     }
 
     const parkSearchHandler = (park) => {
@@ -83,49 +93,25 @@ function Map(props) {
 
 
     return (
-        // <View style={styles.container}>
-        //     <MapView region={mapRegion} style={styles.map}>
-        //         <Marker title='Your Location' coordinate={{
-        //             latitude: mapRegion.latitude,
-        //             longitude: mapRegion.longitude
-        //         }}
-        //         >
-        //             <Image source={require('../assets/active-marker-64.png')} />
-        //         </Marker>
-        //     </MapView>
+        <View style={styles.container}>
+            <MapView region={mapRegion} style={styles.map}>
+                <Marker title='Your Location' coordinate={{
+                    latitude: mapRegion.latitude,
+                    longitude: mapRegion.longitude
+                }}
+                >
+                    <Image source={require('../assets/active-marker-64.png')} />
+                </Marker>
+            </MapView>
 
             <View style={styles.placesSearch}>
             <GooglePlacesSearch />
             </View>
-
-            /* 
-            <View style={styles.form}>
-                <TextInput style={styles.formInput} onChangeText={parkSearchHandler}/>
-                <View style={styles.formButton}>
-                <Button  title='Search' />
-                </View>
-            </View> */
-            /* <View style={styles.placesSearch}>
-                <Placesearch
-                    apikey="AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE" // required *
-                    SelectedAddress={(data) => console.log(data)} // required *
-                    country="jo" //optional
-                    InputContainer={{ 'your style goes here'}} //optional
-                    MainContainer={{ 'your style goes here'}} //optional
-                    ListStyle={{ 'your style goes here'}} //optional
-                    ListTextStyle={{ 'your style goes here'}} //optional
-                    ListIconStyle={{ 'your style goes here'}} //optional
-                    ImgStyle={{ 'your style goes here'}} //optional
-                    Img={{ 'your style goes here'}} //optional
-                    textInput={{ 'your style goes here'}} //optional
-                    placeHolder={{ 'type any textInput placeholder as you like'}} //optional
-                />
-            </View> */
-            /* <View style={styles.button}>
-                <Button title='Offer a Park' onPress={offerParkConfirmation} />
-            </View> */
             
-        // </View>
+            <View style={styles.button}>
+                <Button title='Offer a Park' onPress={offerParkConfirmation} />
+            </View>
+        </View>
     )
 }
 
@@ -163,7 +149,7 @@ const styles = StyleSheet.create({
         top:50,
         flex:1,
         width: Dimensions.get('window').width * .8,
-        height: Dimensions.get('window').height * 0.55,
+        height: Dimensions.get('window').height * 0.15,
     },
     formButton: {
         // position:'absolute',

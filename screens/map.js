@@ -76,7 +76,7 @@ function Map(props) {
         // dispatch(parkinActions.offerPark(user))
         dispatch(parkinActions.offerPark(
             {
-                id: 'QroFr5yp7gYRxWwPr9rYXLBxvId2',
+                id: 'QroFr5yp7gYRxWwPr9rYXLBxvId3',
                 location:{
                     lat: 31.975500,
                     lng: 35.913930,

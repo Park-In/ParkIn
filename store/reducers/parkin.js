@@ -1,9 +1,13 @@
 const initialState = {
     users: [{
-        id: 'u1',
-        location: {}
+
     }],
-    currentUser: { name: 'hi' }
+    parks:[{
+
+    }],
+    currentUser: {
+
+    }
 };
 
 export default (state = initialState, action) => {
@@ -56,6 +60,19 @@ export default (state = initialState, action) => {
                 ...state,
                 users: usersArr
             })
+            case 'FETCH_PARKS':
+                // console.log('action users', action.users);
+                let parksArr = [];
+                for (const park in action.parks) {
+                    parksArr.push({
+                        ownerId: action.parks[park].parkOwner,
+                        location: action.parks[park].location
+                    })
+                }
+                return ({
+                    ...state,
+                    parks: parksArr
+                })
         default:
             return state;
     }

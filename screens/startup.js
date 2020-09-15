@@ -19,7 +19,7 @@ const StartupScreen = props => {
         const tryLogin = async () => {
             const userData = await getItem();
             if (!userData) {
-                navigation.navigate('Auth');
+                navigation.navigate('Splash');
                 return;
             }
             const transformedData = JSON.parse(userData);
@@ -27,7 +27,7 @@ const StartupScreen = props => {
             const expirationDate = new Date(tokenExpiry);
 
             if (expirationDate <= new Date() || !token || !id) {
-                navigation.navigate('Auth');
+                navigation.navigate('Signin');
                 return;
             }
 

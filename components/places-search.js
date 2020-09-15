@@ -12,10 +12,13 @@ const App = () => {
         query={{
           key: GOOGLE_PLACES_API_KEY,
           language: 'en', // language of the results
-          components: 'country:us',
+          components: 'country:jo',
         }}
-        onPress={(data, details = null) => console.log(data)}
+        onPress={(data, details = null) => {console.log(data)}}
         onFail={(error) => console.error(error)}
+        GoogleReverseGeocodingQuery={{
+            globalCode:'8G3QXW00+',
+        }}
         styles={{
           textInputContainer: {
             backgroundColor: 'rgba(0,0,0,0)',

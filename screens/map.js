@@ -3,14 +3,16 @@ import { View, Text, StyleSheet, Dimensions, Button, Alert, Image } from 'react-
 import { useAsyncStorage } from '@react-native-community/async-storage';
 import { Marker } from 'react-native-maps';
 import MapView from 'react-native-maps';
-import Placesearch from 'react-native-placesearch';
-import GooglePlacesSearch from 'react-native-google-places-autocomplete';
+// import Placesearch from 'react-native-placesearch';
+// import GooglePlacesSearch from 'react-native-google-places-autocomplete';
 
 
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as parkinActions from '../store/actions/parkin.js'
 import { TextInput } from 'react-native-gesture-handler';
+
+import GooglePlacesSearch from '../components/places-search.js'
 
 
 function Map(props) {

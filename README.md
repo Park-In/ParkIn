@@ -51,6 +51,12 @@
 ![Users Schema](./assets/usersC.PNG)
 ![Parks Schema](./assets/parksC.PNG)
 
+* How to start:
+
+  - clone repo
+  - npm i
+  - npm run
+
 * Application Screens 
 ![splash.jpg](./assets/splash.jpg)
 ![signup.jpg](./assets/signup.jpg)

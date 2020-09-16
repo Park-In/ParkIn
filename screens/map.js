@@ -4,11 +4,18 @@ import { useAsyncStorage } from '@react-native-community/async-storage';
 import { Marker } from 'react-native-maps';
 import MapView from 'react-native-maps';
 import { LinearGradient } from 'expo-linear-gradient';
+import MapViewDirections from 'react-native-maps-directions';
+import mapStyle from '../helper/mapStyle'
+const { width, height } = Dimensions.get('window');
 
 
-// import Placesearch from 'react-native-placesearch';
-// import GooglePlacesSearch from 'react-native-google-places-autocomplete';
-
+function arePointsNear(checkPoint, centerPoint, km) {
+    var ky = 40000 / 360;
+    var kx = Math.cos(Math.PI * centerPoint.latitude / 180.0) * ky;
+    var dx = Math.abs(centerPoint.longitude - checkPoint.longitude) * kx;
+    var dy = Math.abs(centerPoint.latitude - checkPoint.latitude) * ky;
+    return Math.sqrt(dx * dx + dy * dy) <= km;
+}
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -28,15 +35,19 @@ function Map(props) {
     const [offerParkModalVisible, setOfferParkModalVisible] = useState(false);
     const [reserverParkModalVisible, setReserveParkModalVisible] = useState(false);
     const [routingModalVisible, setRoutingModalVisible] = useState(false);
-
-    // const [parks, setParks] = useState([]);
-
+    const [distenation, setDistenation] = useState({})
+    const [selectedParkRegion, setSelectedParkRegion] = useState({})
     const [mapRegion, setMapRegion] = useState({
         latitude: 31.9539,
         longitude: 35.9106,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
     });
+
+
+
+    // const [parks, setParks] = useState([]);
+
 
     useEffect(() => {
         dispatch(parkinActions.fetchUsers())
@@ -60,7 +71,6 @@ function Map(props) {
     }, [])
 
     if (Object.keys(user).length !== 0) {
-
         useEffect(() => {
             // console.log('userExists', users)
             setMapRegion({
@@ -75,17 +85,32 @@ function Map(props) {
         console.log('users', users)
     }
 
+
+    useEffect(() => {
+        navigator.geolocation.watchPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+                setMapRegion({
+                    latitude: latitude,
+                    longitude: longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                })
+            },
+            error => console.warn('error', error),
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        );
+    }, [])
+
     const offerParkHandler = () => {
         // dispatch(parkinActions.offerPark(user))
         dispatch(parkinActions.offerPark(
             {
-                id: 'QroFr5yp7gYRxWwPr9rYXLBxvId3',
-                location: {
-                    lat: 31.975500,
-                    lng: 35.913930,
-                },
+                id: user.id,
+                location: user.location
             }
         ))
+        setOfferParkModalVisible(false)
     }
 
     const searchClickHandler = (searchRevData) => {
@@ -104,6 +129,14 @@ function Map(props) {
     }
 
     const showReserveModal = (park) => {
+        if(park.location){
+        setSelectedParkRegion({
+            latitude: park.location.lat,
+            longitude: park.location.lng,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        })
+        }
         setReserveParkModalVisible(!routingModalVisible)
     }
 
@@ -116,10 +149,22 @@ function Map(props) {
 
     return (
         <View style={styles.container}>
-            <MapView region={mapRegion} style={styles.map}>
+            <MapView
+                region={mapRegion}
+                showsUserLocation={true}
+                ref={c => mapview = c}
+                loadingEnabled={true}
+                followsUserLocation={true}
+                showsCompass={true}
+                userLocationUpdateInterval={50}
+                customMapStyle={mapStyle}
+                style={styles.map}
+                timePrecision='now'
+
+            >
                 <Marker
                     title='Your Location'
-                    onPress={() => { setOfferParkModalVisible(!offerParkModalVisible)}}
+                    onPress={() => { setOfferParkModalVisible(!offerParkModalVisible) }}
                     coordinate={{
                         latitude: user.location.lat,
                         longitude: user.location.lng
@@ -145,15 +190,45 @@ function Map(props) {
                     // :
                     // null
                 }
+
+                {selectedParkRegion.latitude ? 
+                <MapViewDirections
+                    optimizeWaypoints={true}
+                    resetOnChange={true}
+                    origin={mapRegion}
+                    mode='DRIVING'
+                    strokeWidth={3}
+                    strokeColor='blue'
+                    // strokeColor='#009387'
+                    onReady={result => {
+                        setDistenation(result)
+                        if (mapview !== null) {
+                            mapview.fitToCoordinates(result.coordinates, {
+                                edgePadding: {
+                                    right: (width / 20),
+                                    bottom: (height / 20),
+                                    left: (width / 20),
+                                    top: (height / 20),
+                                }
+                            })
+                        }
+                    }}
+    
+                    destination={{
+                        latitude: selectedParkRegion.latitude,
+                        longitude: selectedParkRegion.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                    apikey={'AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE'}
+                />
+                : null
+                }
             </MapView>
 
             <View style={styles.placesSearch}>
                 <GooglePlacesSearch isSearchClicked={searchClickHandler} />
             </View>
-
-            {/* <View style={styles.button}>
-                <Button title='Offer a Park' onPress={offerParkConfirmation} />
-            </View> */}
 
             <Modal
                 animationType='slide'
@@ -168,7 +243,7 @@ function Map(props) {
                             </View>
                             <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
                                 <View style={{ backgroundColor: 'white', flex: 3, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
-                                    <View style={{ width: 70, height: 70, borderRadius: 35, borderColor:'purple', borderWidth: 2 }}>
+                                    <View style={{ width: 70, height: 70, borderRadius: 35, borderColor: 'purple', borderWidth: 2 }}>
                                         <Image style={{ width: '100%', height: '100%' }} source={require('../assets/logo.png')} />
                                     </View>
                                     <View>
@@ -215,13 +290,13 @@ function Map(props) {
                             </View>
                             <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
                                 <View style={{ backgroundColor: 'white', flex: 3, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
-                                    <View style={{paddingHorizontal:25}}>
-                                        <Text numberOfLines={13} style={{ color: 'black', fontWeight: 'bold',textAlign:'center', justifyContent:'center', fontSize: 15 }}>Would you like to attribute to the community and gain a few bucks at the same time by offering your park for reservation?</Text>
+                                    <View style={{ paddingHorizontal: 25 }}>
+                                        <Text numberOfLines={13} style={{ color: 'black', fontWeight: 'bold', textAlign: 'center', justifyContent: 'center', fontSize: 15 }}>Would you like to attribute to the community and gain a few bucks at the same time by offering your park for reservation?</Text>
                                     </View>
                                 </View >
                                 <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
                                     <View>
-                                    <TouchableOpacity style={styles.button} onPress={() => { setOfferParkModalVisible(!offerParkModalVisible) }}>
+                                        <TouchableOpacity style={styles.button} onPress={() => { setOfferParkModalVisible(!offerParkModalVisible) }}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}
@@ -234,7 +309,7 @@ function Map(props) {
                                         </TouchableOpacity>
                                     </View>
                                     <View>
-                                        <TouchableOpacity style={styles.button} onPress={() => { offerParkHandler }}>
+                                        <TouchableOpacity style={styles.button} onPress={() => { offerParkHandler() }}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}
@@ -259,7 +334,7 @@ function Map(props) {
                 visible={reserverParkModalVisible}
                 transparent
                 backgroundColor='grey'>
-                <TouchableOpacity style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} onPress={showReserveModal}>
+                <TouchableOpacity style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} onPress={() => setReserveParkModalVisible(false)}>
                     <TouchableWithoutFeedback>
                         <View style={{ alignItems: 'center', height: '25%', width: '100%', backgroundColor: 'white', borderTopLeftRadius: 100, borderTopRightRadius: 100, borderColor: '#009387', borderWidth: 3, overflow: 'hidden' }}>
                             <View style={{ flex: 1, backgroundColor: '#009387', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
@@ -281,8 +356,8 @@ function Map(props) {
 
                                 </View >
                                 <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
-                                <View>
-                                    <TouchableOpacity style={styles.button} onPress={() => { setReserveParkModalVisible(!reserverParkModalVisible) }}>
+                                    <View>
+                                        <TouchableOpacity style={styles.button} onPress={() => { setReserveParkModalVisible(!reserverParkModalVisible) }}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}
@@ -295,7 +370,7 @@ function Map(props) {
                                         </TouchableOpacity>
                                     </View>
                                     <View>
-                                        <TouchableOpacity style={styles.button} onPress={() => {}}>
+                                        <TouchableOpacity style={styles.button} onPress={() => { }}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}

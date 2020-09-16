@@ -2,9 +2,9 @@ const initialState = {
     users: [{
 
     }],
-    parks: [{
-
-    }],
+    parks: [
+        
+    ],
     currentUser: {
 
     },

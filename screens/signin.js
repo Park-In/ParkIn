@@ -7,7 +7,8 @@ import {
     Platform,
     StyleSheet,
     StatusBar,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
@@ -161,17 +162,24 @@ const SignInScreen = () => {
                     </TouchableOpacity>
                 </View>
 
+
                 <TouchableOpacity style={styles.button} onPress={signHandler}>
                     <LinearGradient
                         colors={['#08d4c4', '#01ab9d']}
                         style={styles.signIn}
                     >
-                        <Text style={styles.textSign, { color: '#fff' }}>
-                            Sign In
-                        </Text>
-                    </LinearGradient>
+                        {isFetching ?
+                            <ActivityIndicator size='large' color='#fff' />
+                            :
+                            <Text style={styles.textSign, { color: '#fff' }}>
 
+                                'Sign In'
+                        </Text>
+                        }
+                    </LinearGradient>
                 </TouchableOpacity>
+
+
                 <TouchableOpacity
                     onPress={() => navigation.navigate('Signup')}
                     style={[styles.signIn, {
@@ -184,6 +192,7 @@ const SignInScreen = () => {
                         color: '#009387'
                     }}>Sign Up</Text>
                 </TouchableOpacity>
+
             </Animatable.View>
         </View>
     )

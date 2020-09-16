@@ -5,6 +5,7 @@ import { Marker } from 'react-native-maps';
 import MapView from 'react-native-maps';
 import { LinearGradient } from 'expo-linear-gradient';
 
+
 // import Placesearch from 'react-native-placesearch';
 // import GooglePlacesSearch from 'react-native-google-places-autocomplete';
 
@@ -74,10 +75,6 @@ function Map(props) {
         console.log('users', users)
     }
 
-    const offerParkConfirmation = () => {
-        Alert.alert('Confirmation', 'Do you want to offer you park for reservation?', [{ text: 'yes', onPress: offerParkHandler }, { text: 'no' }])
-    }
-
     const offerParkHandler = () => {
         // dispatch(parkinActions.offerPark(user))
         dispatch(parkinActions.offerPark(
@@ -115,12 +112,14 @@ function Map(props) {
     }
 
 
+
+
     return (
         <View style={styles.container}>
             <MapView region={mapRegion} style={styles.map}>
                 <Marker
                     title='Your Location'
-                    onPress={() => { setModalIsVisible(!modalIsVisible); console.log(parks) }}
+                    onPress={() => { setOfferParkModalVisible(!offerParkModalVisible)}}
                     coordinate={{
                         latitude: user.location.lat,
                         longitude: user.location.lng
@@ -156,7 +155,7 @@ function Map(props) {
                 <Button title='Offer a Park' onPress={offerParkConfirmation} />
             </View> */}
 
-            {/* <Modal
+            <Modal
                 animationType='slide'
                 visible={routingModalVisible}
                 transparent
@@ -222,7 +221,7 @@ function Map(props) {
                                 </View >
                                 <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
                                     <View>
-                                    <TouchableOpacity style={styles.button} onPress={() => { setModalIsVisible(!modalIsVisible) }}>
+                                    <TouchableOpacity style={styles.button} onPress={() => { setOfferParkModalVisible(!offerParkModalVisible) }}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}
@@ -253,7 +252,7 @@ function Map(props) {
                         </View>
                     </TouchableWithoutFeedback>
                 </TouchableOpacity>
-            </Modal> */}
+            </Modal>
 
             <Modal
                 animationType='slide'
@@ -283,7 +282,7 @@ function Map(props) {
                                 </View >
                                 <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
                                 <View>
-                                    <TouchableOpacity style={styles.button} onPress={() => { setModalIsVisible(!modalIsVisible) }}>
+                                    <TouchableOpacity style={styles.button} onPress={() => { setReserveParkModalVisible(!reserverParkModalVisible) }}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}
@@ -296,7 +295,7 @@ function Map(props) {
                                         </TouchableOpacity>
                                     </View>
                                     <View>
-                                        <TouchableOpacity style={styles.button} onPress={() => { offerParkHandler }}>
+                                        <TouchableOpacity style={styles.button} onPress={() => {}}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}

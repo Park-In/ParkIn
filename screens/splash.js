@@ -36,8 +36,10 @@ const SplashScreen = () => {
                 style={styles.footer}
                 animation='fadeInUpBig'
                 >
-                <Text style={styles.title}>Stay connected with everyone!</Text>
+                <Text style={styles.title}>The Way To Park!</Text>
                 <Text style={styles.text}>Sign in with account</Text>
+                <Text style={styles.text}>Offer and reserve parks on the go, while getting some cash in the process!</Text>
+
                 <View style={styles.button}>
                 <TouchableOpacity onPress={()=>navigation.navigate('Signup')}>
                     <LinearGradient
@@ -92,7 +94,8 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'grey',
-        marginTop: 5
+        marginTop: 5,
+        fontSize:16
     },
     button: {
         alignItems: 'flex-end',

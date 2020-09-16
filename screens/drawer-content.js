@@ -162,8 +162,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#009387',
         borderTopWidth: 16,
         borderBottomWidth: 16,
-        // backgroundColor:'#009387',
-
     },
 
 });

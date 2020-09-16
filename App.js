@@ -21,13 +21,9 @@ const store = createStore(rootReducer, applyMiddleware(ReduxThunk))
 
 export default function App() {
 
-  // useEffect(() =>{
-  //   registerForPushNotificationsAsync.registerForPushNotificationsAsync();
-  // });
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
       const url = response;
-      console.log(url);
     });
   },[Notifications])
 

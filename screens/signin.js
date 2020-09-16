@@ -63,7 +63,6 @@ const SignInScreen = () => {
                 lat: location.coords.latitude,
                 lng: location.coords.longitude,
             });
-            // console.log('location',location);
             navigation.navigate('Map');
         } catch (err) {
             setIsFetching(false);

@@ -5,8 +5,7 @@ function Profile(props) {
     return(
         <View style={styles.container}>
             <View style={styles.header}>
-
-            <Image style={{width:150,height:150,borderRadius:75}} source={{uri:'https://i.pinimg.com/originals/c7/28/a8/c728a89a09e0bc6b0aabfcd44e3e4d52.jpg'}} />
+                <Text>Still Under Development</Text>
             </View>
         </View>
     )

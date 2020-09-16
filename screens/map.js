@@ -37,7 +37,10 @@ function Map(props) {
     const [reserverParkModalVisible, setReserveParkModalVisible] = useState(false);
     const [routingModalVisible, setRoutingModalVisible] = useState(false);
     const [distenation, setDistenation] = useState({})
+    const [confirmedPark, setConfirmedPark] = useState(false)
     const [selectedParkRegion, setSelectedParkRegion] = useState({})
+    const [showDistenationInfo, setShowDistenationInfo] = useState(false)
+    const [arrived, setArrived] = useState(false)
     const [mapRegion, setMapRegion] = useState({
         latitude: 31.9539,
         longitude: 35.9106,
@@ -58,22 +61,18 @@ function Map(props) {
     const users = useSelector(state => state.parkin.users);
     const user = useSelector(state => state.parkin.currentUser);
     const parks = useSelector(state => state.parkin.parks);
-    // console.log('usersbefore', users)
-    // console.log('userbefore', user)
-    console.log('parksbefore', parks)
+ 
 
     useEffect(() => {
         const getLocalInfo = async () => {
             const userDataString = await getItem();
             const userData = JSON.parse(userDataString);
-            console.log('got userdata', userData);
         }
         getLocalInfo();
     }, [])
 
     if (Object.keys(user).length !== 0) {
         useEffect(() => {
-            // console.log('userExists', users)
             setMapRegion({
                 latitude: user.location.lat,
                 longitude: user.location.lng,
@@ -104,18 +103,16 @@ function Map(props) {
     }, [])
 
     const offerParkHandler = () => {
-        // dispatch(parkinActions.offerPark(user))
         dispatch(parkinActions.offerPark(
-            {   
+            {
                 id: user.id,
                 location: user.location
             }
         ))
-        setOfferParkModalVisible(false)
+        setOfferParkModalVisible(!showOfferModal)
     }
 
     const searchClickHandler = (searchRevData) => {
-        // const searchLocation = searchRevData.results[0].geometry.location
         setIsSearched(true);
         setMapRegion({
             latitude: searchRevData.lat,
@@ -130,13 +127,13 @@ function Map(props) {
     }
 
     const showReserveModal = (park) => {
-        if(park.location){
-        setSelectedParkRegion({
-            latitude: park.location.lat,
-            longitude: park.location.lng,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-        })
+        if (park.location) {
+            setSelectedParkRegion({
+                latitude: park.location.lat,
+                longitude: park.location.lng,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            })
         }
         setReserveParkModalVisible(!routingModalVisible)
     }
@@ -145,11 +142,23 @@ function Map(props) {
         setRoutingModalVisible(!routingModalVisible)
     }
 
+    const handelConfirmedPark = () => {
+            setConfirmedPark(true)
+            setReserveParkModalVisible(!reserverParkModalVisible)
+            setMapRegion({
+                latitude: user.location.lat,
+                longitude: user.location.lng,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            })
+            setTimeout(() => {
+                setRoutingModalVisible(true)
+            }, 1000)
 
+    }
 
 
     return (
-        // <View style={styles.container}>
         <>
             <MapView
                 region={mapRegion}
@@ -162,7 +171,7 @@ function Map(props) {
                 customMapStyle={mapStyle}
                 style={styles.map}
                 timePrecision='now'
-
+                onPress={()=> setRoutingModalVisible(true)}
             >
                 <Marker
                     title='Your Location'
@@ -176,55 +185,53 @@ function Map(props) {
                 </Marker>
 
                 {
-                    // isSearched ?
                     parks.map(park => {
-                        console.log(park)
-                        return (
-                            <Marker onPress={() => showReserveModal(park)} key={park.location.lat + park.location.lng} title='Park' coordinate={{
-                                latitude: park.location.lat,
-                                longitude: park.location.lng
-                            }}
-                            >
-                                <Image source={require('../assets/garage-30.png')} />
-                            </Marker>
-                        )
+                        return <Marker onPress={() => showReserveModal(park)} key={park.location.lat + park.location.lng} title='Park' coordinate={{
+                            latitude: park.location.lat,
+                            longitude: park.location.lng
+                        }}
+                        >
+                        <Image source={require(`../assets/near3.png`)} />
+                        </Marker>
                     })
-                    // :
-                    // null
                 }
 
-                {selectedParkRegion.latitude ? 
-                <MapViewDirections
-                    optimizeWaypoints={true}
-                    resetOnChange={true}
-                    origin={mapRegion}
-                    mode='DRIVING'
-                    strokeWidth={3}
-                    strokeColor='blue'
-                    // strokeColor='#009387'
-                    onReady={result => {
-                        setDistenation(result)
-                        if (mapview !== null) {
-                            mapview.fitToCoordinates(result.coordinates, {
-                                edgePadding: {
-                                    right: (width / 20),
-                                    bottom: (height / 20),
-                                    left: (width / 20),
-                                    top: (height / 20),
-                                }
-                            })
-                        }
-                    }}
-    
-                    destination={{
-                        latitude: selectedParkRegion.latitude,
-                        longitude: selectedParkRegion.longitude,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                    }}
-                    apikey={'AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE'}
-                />
-                : null
+                {confirmedPark ?
+                    <MapViewDirections
+                        optimizeWaypoints={true}
+                        resetOnChange={true}
+                        origin={mapRegion}
+                        mode='DRIVING'
+                        strokeWidth={3}
+                        strokeColor='blue'
+                        onReady={result => {
+                            if (arePointsNear(mapRegion, selectedParkRegion, 0.1)) {
+                                setRoutingModalVisible(false)
+                                setConfirmedPark(false)
+                                setArrived(true)
+                            }
+                            setDistenation(result)
+                            if (mapview !== null) {
+                                mapview.fitToCoordinates(result.coordinates, {
+                                    edgePadding: {
+                                        right: (width / 20),
+                                        bottom: (height / 20),
+                                        left: (width / 20),
+                                        top: (height / 20),
+                                    }
+                                })
+                            }
+                        }}
+
+                        destination={{
+                            latitude: selectedParkRegion.latitude,
+                            longitude: selectedParkRegion.longitude,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}
+                        apikey={'AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE'}
+                    />
+                    : null
                 }
             </MapView>
 
@@ -232,16 +239,16 @@ function Map(props) {
                 <GooglePlacesSearch isSearchClicked={searchClickHandler} />
             </View>
 
-            <TouchableOpacity onPress={() => {navigation.openDrawer()}} style={{ position:'absolute', bottom:25, left:8}}>
-                    <View>
-                        <ImageBackground style={{width: 50, height:50}} source={require('../assets/menu-192.png')}>
-                        </ImageBackground>
-                    </View>
-                </TouchableOpacity>
+            <TouchableOpacity onPress={() => { navigation.openDrawer() }} style={{ position: 'absolute', bottom: 25, left: 8 }}>
+                <View>
+                    <ImageBackground style={{ width: 50, height: 50 }} source={require('../assets/menu-192.png')}>
+                    </ImageBackground>
+                </View>
+            </TouchableOpacity>
 
-            <Modal
+            { (routingModalVisible && confirmedPark && <Modal
                 animationType='slide'
-                visible={routingModalVisible}
+                visible={true}
                 transparent
                 backgroundColor='grey'>
                 <TouchableOpacity style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} onPress={showRoutingModal}>
@@ -253,7 +260,7 @@ function Map(props) {
                             <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
                                 <View style={{ backgroundColor: 'white', flex: 3, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
                                     <View style={{ width: 70, height: 70, borderRadius: 35, borderColor: 'purple', borderWidth: 2 }}>
-                                        <Image style={{ width: '100%', height: '100%' }} source={{uri:'https://avatars3.githubusercontent.com/u/60567574?s=400&u=4d73bdc8bafc293d6734181751a262adf8637ded&v=4'}} />
+                                        <Image style={{ width: '100%', height: '100%' }} source={{ uri: 'https://avatars3.githubusercontent.com/u/60567574?s=400&u=4d73bdc8bafc293d6734181751a262adf8637ded&v=4' }} />
                                     </View>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Owner</Text>
@@ -268,11 +275,11 @@ function Map(props) {
                                 <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Arrive In</Text>
-                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>23m</Text>
+                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>{Math.round(distenation.duration)}m</Text>
                                     </View>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Distance Left</Text>
-                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>10km</Text>
+                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>{distenation.distance.toFixed(1)}km</Text>
                                     </View>
                                 </View>
                                 <View style={{ backgroundColor: 'white', flex: 1, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
@@ -283,7 +290,7 @@ function Map(props) {
                         </View>
                     </TouchableWithoutFeedback>
                 </TouchableOpacity>
-            </Modal>
+            </Modal>)}
 
 
             <Modal
@@ -351,8 +358,8 @@ function Map(props) {
                             </View>
                             <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
                                 <View style={{ backgroundColor: 'white', flex: 3, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
-                                    <View style={{ width: 70, height: 70, borderRadius: 35, borderColor: 'black', borderWidth: 2, overflow:'hidden' }}>
-                                        <Image style={{ width: '100%', height: '100%' }} source={{uri:'https://avatars3.githubusercontent.com/u/60567574?s=400&u=4d73bdc8bafc293d6734181751a262adf8637ded&v=4'}} />
+                                    <View style={{ width: 70, height: 70, borderRadius: 35, borderColor: 'black', borderWidth: 2, overflow: 'hidden' }}>
+                                        <Image style={{ width: '100%', height: '100%' }} source={{ uri: 'https://avatars3.githubusercontent.com/u/60567574?s=400&u=4d73bdc8bafc293d6734181751a262adf8637ded&v=4' }} />
                                     </View>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Owner</Text>
@@ -379,7 +386,7 @@ function Map(props) {
                                         </TouchableOpacity>
                                     </View>
                                     <View>
-                                        <TouchableOpacity style={styles.button} onPress={() => { }}>
+                                        <TouchableOpacity style={styles.button} onPress={() => handelConfirmedPark()}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}
@@ -411,8 +418,42 @@ function Map(props) {
                     </TouchableWithoutFeedback>
                 </TouchableOpacity>
             </Modal>
-            </>
-        /* // </View> */
+
+            <Modal
+                animationType='slide'
+                visible={arrived}
+                transparent
+                backgroundColor='grey'>
+                <TouchableOpacity style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} onPress={showOfferModal}>
+                    <TouchableWithoutFeedback>
+                        <View style={{ alignItems: 'center', height: '25%', width: '100%', backgroundColor: 'white', borderTopLeftRadius: 100, borderTopRightRadius: 100, borderColor: '#009387', borderWidth: 3, overflow: 'hidden' }}>
+                            <View style={{ flex: 1, backgroundColor: '#009387', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ color: 'white', fontSize: 19, fontWeight: 'bold', width: '100%', textAlign: 'center' }}>YOU HAVE ARRIVED</Text>
+                            </View>
+                            <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
+                                <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
+                                    <View>
+                                        <TouchableOpacity style={styles.button} onPress={() => { setArrived(false) }}>
+                                            <LinearGradient
+                                                colors={['#08d4c4', '#01ab9d']}
+                                                style={styles.signIn}
+                                            >
+                                                <Text style={styles.textSign, { color: '#fff' }}>
+                                                    OK
+                                                </Text>
+                                            </LinearGradient>
+
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </TouchableOpacity>
+            </Modal>
+        </>
+
     )
 }
 
@@ -424,14 +465,12 @@ const styles = StyleSheet.create({
 
     },
     map: {
-        flex:1,
-        alignItems:'center',
-        justifyContent:'center'
-        // width: Dimensions.get('window').width * .95,
-        // height: Dimensions.get('window').height
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+
     },
     button: {
-        // position: 'absolute',
     },
     form: {
         flex: 1,
@@ -454,15 +493,12 @@ const styles = StyleSheet.create({
         flex: 1,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height * 0.25,
-        flexDirection:'row',
-        alignItems:'flex-start',
-        justifyContent:'center',
-        paddingHorizontal:30
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        paddingHorizontal: 30
     },
-    formButton: {
-        // position:'absolute',
-        // bottom:0
-    },
+
     formInput: {
         borderBottomColor: 'black',
         borderBottomWidth: 3,
@@ -479,8 +515,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     button: {
-        // width: '200%',
-        // paddingHorizontal:100,
         alignItems: 'center',
     },
 

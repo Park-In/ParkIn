@@ -23,7 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 
 export function DrawerContent(props) {
 
-    const {setItem, getItem} = useAsyncStorage();
+    const {removeItem} = useAsyncStorage('@userData');
 
 
     return (
@@ -31,11 +31,16 @@ export function DrawerContent(props) {
             <DrawerContentScrollView {...props}>
                 <View style={styles.drawerContent}>
                     <View style={styles.userInfoSection}>
-                        <View style={{ flexDirection: 'row', marginTop: 15, }}>
+                        <View style={{ flexDirection: 'row', marginTop: 15 }}>
+                            <View style={{borderColor:'white', borderRadius:25, borderWidth:2}}>
                             <Avatar.Image
-                                source={require('../assets/logo.png')}
+                                source={{uri:'https://avatars2.githubusercontent.com/u/60566837?s=460&u=755a83740d98d37803ab3cabdcb65d28e9577641&v=4'}}
                                 size={50}
+                                backgroundColor='white'
+                                borderColor='white'
+                                borderRadius={50}        
                             />
+                            </View>
                             <View style={{justifyContent:'center', marginTop:-6}}>
                                 <Title style={{...styles.title, marginLeft:8}}>
                                     Muhammed Tommalieh
@@ -104,7 +109,7 @@ export function DrawerContent(props) {
                         />
                     )}
                     label='Sign Out'
-                    onPress={() => { }}
+                    onPress={() => removeItem()}
                     labelStyle={{color:'white'}}
                     
                 />

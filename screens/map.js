@@ -105,7 +105,7 @@ function Map(props) {
     const offerParkHandler = () => {
         // dispatch(parkinActions.offerPark(user))
         dispatch(parkinActions.offerPark(
-            {
+            {   
                 id: user.id,
                 location: user.location
             }
@@ -148,7 +148,7 @@ function Map(props) {
 
 
     return (
-        <View style={styles.container}>
+        <>
             <MapView
                 region={mapRegion}
                 showsUserLocation={true}
@@ -226,6 +226,9 @@ function Map(props) {
                 }
             </MapView>
 
+        <View style={styles.container}>
+
+
             <View style={styles.placesSearch}>
                 <GooglePlacesSearch isSearchClicked={searchClickHandler} />
             </View>
@@ -244,7 +247,7 @@ function Map(props) {
                             <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
                                 <View style={{ backgroundColor: 'white', flex: 3, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
                                     <View style={{ width: 70, height: 70, borderRadius: 35, borderColor: 'purple', borderWidth: 2 }}>
-                                        <Image style={{ width: '100%', height: '100%' }} source={require('../assets/logo.png')} />
+                                        <Image style={{ width: '100%', height: '100%' }} source={{uri:'https://avatars3.githubusercontent.com/u/60567574?s=400&u=4d73bdc8bafc293d6734181751a262adf8637ded&v=4'}} />
                                     </View>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Owner</Text>
@@ -342,8 +345,8 @@ function Map(props) {
                             </View>
                             <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
                                 <View style={{ backgroundColor: 'white', flex: 3, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
-                                    <View style={{ width: 70, height: 70, borderRadius: 35, borderColor: 'purple', borderWidth: 2 }}>
-                                        <Image style={{ width: '100%', height: '100%' }} source={require('../assets/logo.png')} />
+                                    <View style={{ width: 70, height: 70, borderRadius: 35, borderColor: 'black', borderWidth: 2, overflow:'hidden' }}>
+                                        <Image style={{ width: '100%', height: '100%' }} source={{uri:'https://avatars3.githubusercontent.com/u/60567574?s=400&u=4d73bdc8bafc293d6734181751a262adf8637ded&v=4'}} />
                                     </View>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Owner</Text>
@@ -402,7 +405,9 @@ function Map(props) {
                     </TouchableWithoutFeedback>
                 </TouchableOpacity>
             </Modal>
-        </View>
+            </View>
+            </>
+        
     )
 }
 
@@ -414,8 +419,11 @@ const styles = StyleSheet.create({
 
     },
     map: {
-        width: Dimensions.get('window').width * .95,
-        height: Dimensions.get('window').height
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center'
+        // width: Dimensions.get('window').width * .95,
+        // height: Dimensions.get('window').height
     },
     button: {
         // position: 'absolute',

@@ -9,6 +9,18 @@ import mapStyle from '../helper/mapStyle'
 const { width, height } = Dimensions.get('window');
 
 
+function mark(park,near){
+    return (
+        <Marker onPress={() => showReserveModal(park)} key={park.location.lat + park.location.lng} title='Park' coordinate={{
+            latitude: park.location.lat,
+            longitude: park.location.lng
+        }}
+        >
+            {near?<Image source={require(`../assets/nearGarage.png`)} />:<Image source={require(`../assets/garage-30.png`)} />}
+        </Marker>
+    )
+}
+
 function arePointsNear(checkPoint, centerPoint, km) {
     var ky = 40000 / 360;
     var kx = Math.cos(Math.PI * centerPoint.latitude / 180.0) * ky;
@@ -39,6 +51,7 @@ function Map(props) {
     const [confirmedPark,setConfirmedPark] = useState(false)
     const [selectedParkRegion, setSelectedParkRegion] = useState({})
     const [showDistenationInfo,setShowDistenationInfo] = useState(false)
+    const [arrived, setArrived] = useState(false)
     const [mapRegion, setMapRegion] = useState({
         latitude: 31.9539,
         longitude: 35.9106,
@@ -164,7 +177,14 @@ function Map(props) {
     },1000)   
     
    }
-
+//    (true && Alert.alert(
+//     'Alert Title',
+//     'you have arrived', // <- this part is optional, you can pass an empty string
+//     [
+//       {text: 'OK', onPress: () => console.log('OK Pressed')},
+//     ],
+//     {cancelable: false},
+//   ))
 
     return (
         <View style={styles.container}>
@@ -195,16 +215,17 @@ function Map(props) {
                 {
                     // isSearched ?
                     parks.map(park => {
-                        console.log(park)
-                        return (
-                            <Marker onPress={() => showReserveModal(park)} key={park.location.lat + park.location.lng} title='Park' coordinate={{
-                                latitude: park.location.lat,
-                                longitude: park.location.lng
-                            }}
-                            >
-                                <Image source={require('../assets/garage-30.png')} />
-                            </Marker>
-                        )
+                        if(isSearched&&arePointsNear({ latitude: park.location.lat,
+                            longitude: park.location.lng},mapRegion,2)){
+                                console.warn('search');
+                              return  mark(park,true)
+                      } else if(isSearched){
+                          return mark(park,false)
+                      }else if(!isSearched){
+                          console.warn('first');
+                        return  mark(park,false)
+                      } 
+                        else return mark(park,false)
                     })
                     // :
                     // null
@@ -220,8 +241,11 @@ function Map(props) {
                     strokeColor='blue'
                     // strokeColor='#009387'
                     onReady={result => {
-                       if(arePointsNear(mapRegion, selectedParkRegion, 0.1)) console.warn(true)
-                       else console.warn(false)
+                       if(arePointsNear(mapRegion, selectedParkRegion, 0.1)) {
+                           setRoutingModalVisible(false)
+                           setConfirmedPark(false)
+                           setArrived(true)
+                       }
                         setDistenation(result)
                         if (mapview !== null) {
                             mapview.fitToCoordinates(result.coordinates, {
@@ -418,6 +442,58 @@ function Map(props) {
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 9 }}>10km</Text>
                                     </View>
                                 </View>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </TouchableOpacity>
+            </Modal>
+
+            <Modal
+                animationType='slide'
+                visible={arrived}
+                transparent
+                backgroundColor='grey'>
+                <TouchableOpacity style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} onPress={showOfferModal}>
+                    <TouchableWithoutFeedback>
+                        <View style={{ alignItems: 'center', height: '25%', width: '100%', backgroundColor: 'white', borderTopLeftRadius: 100, borderTopRightRadius: 100, borderColor: '#009387', borderWidth: 3, overflow: 'hidden' }}>
+                            <View style={{ flex: 1, backgroundColor: '#009387', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ color: 'white', fontSize: 19, fontWeight: 'bold', width: '100%', textAlign: 'center' }}>you have arrived</Text>
+                            </View>
+                            <View style={{ flex: 4, backgroundColor: 'white', width: '100%', alignItems: 'center' }}>
+                                <View style={{ backgroundColor: 'white', flex: 3, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
+                                    <View style={{ paddingHorizontal: 25 }}>
+                                        <Text numberOfLines={13} style={{ color: 'black', fontWeight: 'bold', textAlign: 'center', justifyContent: 'center', fontSize: 15 }}>Would you like to attribute to the community and gain a few bucks at the same time by offering your park for reservation?</Text>
+                                    </View>
+                                </View >
+                                <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
+                                    <View>
+                                        <TouchableOpacity style={styles.button} onPress={() => { setOfferParkModalVisible(!offerParkModalVisible) }}>
+                                            <LinearGradient
+                                                colors={['#08d4c4', '#01ab9d']}
+                                                style={styles.signIn}
+                                            >
+                                                <Text style={styles.textSign, { color: '#fff' }}>
+                                                    Cancel
+                                                </Text>
+                                            </LinearGradient>
+
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View>
+                                        <TouchableOpacity style={styles.button} onPress={() => { setArrived(false) }}>
+                                            <LinearGradient
+                                                colors={['#08d4c4', '#01ab9d']}
+                                                style={styles.signIn}
+                                            >
+                                                <Text style={styles.textSign, { color: '#fff' }}>
+                                                    OK
+                                                </Text>
+                                            </LinearGradient>
+
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
                             </View>
                         </View>
                     </TouchableWithoutFeedback>

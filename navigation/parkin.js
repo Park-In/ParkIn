@@ -9,6 +9,7 @@ import StartupScreen from '../screens/startup.js';
 import SplashScreen from '../screens/splash.js';
 import SignInScreen from '../screens/signin.js';
 import SignUpScreen from '../screens/signup.js';
+import { DrawerContent } from '../screens/drawer-content.js'
 
 
 
@@ -25,7 +26,7 @@ function MyDrawer(props) {
 
     return (
 
-        <Drawer.Navigator >
+        <Drawer.Navigator drawerContent={props => <DrawerContent {...props}/>}>
             <Drawer.Screen name='Startup' component={StartupScreen} />
             <Drawer.Screen name='Splash' component={SplashScreen} />
             <Drawer.Screen name='Signup' component={SignUpScreen} />

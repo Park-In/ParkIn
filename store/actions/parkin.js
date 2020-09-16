@@ -2,7 +2,8 @@ const SIGNUP = 'SIGNUP';
 const SIGNIN = 'SIGNIN';
 const AUTHENTICATE = 'AUTHENTICATE';
 const FETCH_USERS = 'FETCH_USERS';
-const FETCH_PARKS = 'FETCH_PARKS'
+const FETCH_PARKS = 'FETCH_PARKS';
+const FETCH_GEO = 'FETCH_GEO';
 
 
 
@@ -179,6 +180,19 @@ export const fetchParks = () => {
         const getResData = await getFromDbRes.json();
         // console.log('inDataBase', getResData)
         dispatch({ type: FETCH_PARKS, parks: getResData })
+
+    }
+}
+
+export const fetchGeo = () => {
+    return async dispatch => {
+        const getFromDbRes = await fetch('https://parkin-techathon.firebaseio.com/parks.json');
+        if (!getFromDbRes.ok) {
+            const res = await getFromDbRes.json()
+            throw new Error(res.error.errors[0].message)
+        }
+        const getResData = await getFromDbRes.json();
+        dispatch({ type: FETCH_GEO, searchGeo: getResData })
 
     }
 }

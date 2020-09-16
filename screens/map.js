@@ -36,7 +36,9 @@ function Map(props) {
     const [reserverParkModalVisible, setReserveParkModalVisible] = useState(false);
     const [routingModalVisible, setRoutingModalVisible] = useState(false);
     const [distenation, setDistenation] = useState({})
+    const [confirmedPark,setConfirmedPark] = useState(false)
     const [selectedParkRegion, setSelectedParkRegion] = useState({})
+    const [showDistenationInfo,setShowDistenationInfo] = useState(false)
     const [mapRegion, setMapRegion] = useState({
         latitude: 31.9539,
         longitude: 35.9106,
@@ -110,7 +112,7 @@ function Map(props) {
                 location: user.location
             }
         ))
-        setOfferParkModalVisible(false)
+        setOfferParkModalVisible(!showOfferModal)
     }
 
     const searchClickHandler = (searchRevData) => {
@@ -144,7 +146,24 @@ function Map(props) {
         setRoutingModalVisible(!routingModalVisible)
     }
 
+   const handelConfirmedPark = () =>{
+    setTimeout(()=>{
+        setConfirmedPark(true)
+        setReserveParkModalVisible(!reserverParkModalVisible) 
+        setMapRegion({
+            latitude: user.location.lat,
+            longitude: user.location.lng,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        })
+        setTimeout(()=>{
 
+            setRoutingModalVisible(true)
+        }
+        ,500)
+    },1000)   
+    
+   }
 
 
     return (
@@ -191,7 +210,7 @@ function Map(props) {
                     // null
                 }
 
-                {selectedParkRegion.latitude ? 
+                {confirmedPark? 
                 <MapViewDirections
                     optimizeWaypoints={true}
                     resetOnChange={true}
@@ -201,6 +220,8 @@ function Map(props) {
                     strokeColor='blue'
                     // strokeColor='#009387'
                     onReady={result => {
+                       if(arePointsNear(mapRegion, selectedParkRegion, 0.1)) console.warn(true)
+                       else console.warn(false)
                         setDistenation(result)
                         if (mapview !== null) {
                             mapview.fitToCoordinates(result.coordinates, {
@@ -230,9 +251,9 @@ function Map(props) {
                 <GooglePlacesSearch isSearchClicked={searchClickHandler} />
             </View>
 
-            <Modal
+           { (routingModalVisible && confirmedPark &&<Modal
                 animationType='slide'
-                visible={routingModalVisible}
+                visible={true}
                 transparent
                 backgroundColor='grey'>
                 <TouchableOpacity style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} onPress={showRoutingModal}>
@@ -259,11 +280,11 @@ function Map(props) {
                                 <View style={{ backgroundColor: 'white', flex: 2, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Arrive In</Text>
-                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>23m</Text>
+                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>{Math.round(distenation.duration)}m</Text>
                                     </View>
                                     <View>
                                         <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 15 }}>Distance Left</Text>
-                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>10km</Text>
+                                        <Text style={{ color: 'black', fontWeight: 'bold', width: '120%', textAlign: 'center', fontSize: 12 }}>{distenation.distance.toFixed(1)}km</Text>
                                     </View>
                                 </View>
                                 <View style={{ backgroundColor: 'white', flex: 1, width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
@@ -274,7 +295,7 @@ function Map(props) {
                         </View>
                     </TouchableWithoutFeedback>
                 </TouchableOpacity>
-            </Modal>
+            </Modal>)}
 
 
             <Modal
@@ -370,7 +391,7 @@ function Map(props) {
                                         </TouchableOpacity>
                                     </View>
                                     <View>
-                                        <TouchableOpacity style={styles.button} onPress={() => { }}>
+                                        <TouchableOpacity style={styles.button} onPress={() => handelConfirmedPark()}>
                                             <LinearGradient
                                                 colors={['#08d4c4', '#01ab9d']}
                                                 style={styles.signIn}

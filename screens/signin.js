@@ -172,8 +172,7 @@ const SignInScreen = () => {
                             <ActivityIndicator size='large' color='#fff' />
                             :
                             <Text style={styles.textSign, { color: '#fff' }}>
-
-                                'Sign In'
+                                Sign In
                         </Text>
                         }
                     </LinearGradient>

@@ -25,7 +25,6 @@ export function DrawerContent(props) {
 
     const {removeItem} = useAsyncStorage('@userData');
 
-
     return (
         <View style={{ flex: 1 }}>
             <DrawerContentScrollView {...props}>
@@ -109,7 +108,7 @@ export function DrawerContent(props) {
                         />
                     )}
                     label='Sign Out'
-                    onPress={() => removeItem()}
+                    onPress={() => {removeItem(); props.navigation.navigate('Signin')}}
                     labelStyle={{color:'white'}}
                     
                 />

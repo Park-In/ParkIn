@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, Button, Alert, Image, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Button, Alert, Image, Modal, TouchableOpacity, TouchableWithoutFeedback, ImageBackground } from 'react-native';
 import { useAsyncStorage } from '@react-native-community/async-storage';
 import { Marker } from 'react-native-maps';
 import MapView from 'react-native-maps';
@@ -22,12 +22,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as parkinActions from '../store/actions/parkin.js'
 
 import GooglePlacesSearch from '../components/places-search.js'
+import { useNavigation } from '@react-navigation/native';
 
 
 function Map(props) {
 
     const dispatch = useDispatch();
-
+    const navigation = useNavigation()
     const { setItem, getItem } = useAsyncStorage('@userData');
 
     const [searchInput, setSearchInput] = useState('')
@@ -148,6 +149,7 @@ function Map(props) {
 
 
     return (
+        // <View style={styles.container}>
         <>
             <MapView
                 region={mapRegion}
@@ -226,12 +228,16 @@ function Map(props) {
                 }
             </MapView>
 
-        <View style={styles.container}>
-
-
             <View style={styles.placesSearch}>
                 <GooglePlacesSearch isSearchClicked={searchClickHandler} />
             </View>
+
+            <TouchableOpacity onPress={() => {navigation.openDrawer()}} style={{ position:'absolute', bottom:25, left:8}}>
+                    <View>
+                        <ImageBackground style={{width: 50, height:50}} source={require('../assets/menu-192.png')}>
+                        </ImageBackground>
+                    </View>
+                </TouchableOpacity>
 
             <Modal
                 animationType='slide'
@@ -405,9 +411,8 @@ function Map(props) {
                     </TouchableWithoutFeedback>
                 </TouchableOpacity>
             </Modal>
-            </View>
             </>
-        
+        /* // </View> */
     )
 }
 
@@ -447,8 +452,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 50,
         flex: 1,
-        width: Dimensions.get('window').width * .8,
-        height: Dimensions.get('window').height * 0.15,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height * 0.25,
+        flexDirection:'row',
+        alignItems:'flex-start',
+        justifyContent:'center',
+        paddingHorizontal:30
     },
     formButton: {
         // position:'absolute',

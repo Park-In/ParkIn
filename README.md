@@ -56,6 +56,12 @@
   - clone repo
   - npm i
   - npm run
+  - Scan the code in the website or terminal using your expo application
+
+  Alternativly
+
+  - Visit https://expo.io/@tommalieh/ParkIn
+  - Scan the code in the website using your expo application
 
 * Application Screens 
 ![splash.jpg](./assets/splash.jpg)

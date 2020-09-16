@@ -56,6 +56,7 @@
   - clone repo
   - npm i
   - npm run
+  - Scan the code in the website or terminal using your expo application
 
   Alternativly
 

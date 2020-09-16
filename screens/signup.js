@@ -8,11 +8,12 @@ import {
     StyleSheet,
     StatusBar,
     Alert,
-    ScrollView
+    ScrollView,
+    ActivityIndicator
 } from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
-import {useDispatch} from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome } from '@expo/vector-icons';
@@ -42,32 +43,31 @@ const SignUpScreen = () => {
     const [userLocation, setUserLocation] = useState();
     const [isFetching, setIsFetching] = useState(false);
 
-    const signHandler = async () =>{
+    const signHandler = async () => {
         setIsFetching(true);
 
-        try{
+        try {
 
-        const {status} = await Permissions.askAsync(Permissions.LOCATION);
-        if(status !== 'granted'){
-            Alert.alert('Permession Needed!', 'The location permission is needed to be able to use the app', [{text:'ok'}]);
+            const { status } = await Permissions.askAsync(Permissions.LOCATION);
+            if (status !== 'granted') {
+                Alert.alert('Permession Needed!', 'The location permission is needed to be able to use the app', [{ text: 'ok' }]);
+                setIsFetching(false);
+
+                return;
+            }
+            const location = await Location.getCurrentPositionAsync({ timeout: 5000 });
+
+            await dispatch(parkInActions.signUp(data.email, data.password, { lat: location.coords.latitude, lng: location.coords.longitude }))
+
+            setUserLocation({
+                lat: location.coords.latitude,
+                lng: location.coords.longitude,
+            });
+            navigation.navigate('Map');
+        } catch (err) {
             setIsFetching(false);
-
-            return;
+            Alert.alert('Error!', err.message, [{ text: 'ok' }])
         }
-        const location = await Location.getCurrentPositionAsync({timeout:5000});
-     
-        await dispatch(parkInActions.signUp(data.email, data.password, {lat: location.coords.latitude, lng: location.coords.longitude})) 
-        
-        setUserLocation({
-            lat: location.coords.latitude,
-            lng: location.coords.longitude,
-        });
-        // console.log('location',location);
-        navigation.navigate('Map');
-    }catch(err){
-        setIsFetching(false);
-        Alert.alert('Error!', err.message, [{text:'ok'}])
-    }
     }
 
     const textInputChange = (value) => {
@@ -120,104 +120,108 @@ const SignUpScreen = () => {
             <Animatable.View
                 animation='fadeInUpBig'
                 style={styles.footer}>
-                 <ScrollView>   
-                <Text style={[styles.text_footer, { marginTop: 35 }]}>First Name</Text>
-                <View style={styles.action}>
-                    <MaterialCommunityIcons name="format-letter-case" size={24} color="#05375a" />
-                    <TextInput
-                        placeholder='Your First Name'
-                        style={styles.textInput}
-                        autoCapitalize='none'
-                        onChangeText={(nameValue => nameInputChange(nameValue))}
-                    />
-                </View>
-                
-                <Text style={[styles.text_footer, { marginTop: 35 }]}>Last Name</Text>
-                <View style={styles.action}>
-                <MaterialCommunityIcons name="format-letter-case" size={24} color="#05375a" />
-                    <TextInput
-                        placeholder='Your Last Name'
-                        style={styles.textInput}
-                        autoCapitalize='none'
-                        onChangeText={(nameValue => nameInputChange(nameValue))}
-                    />
-                </View>
+                <ScrollView>
+                    <Text style={[styles.text_footer, { marginTop: 35 }]}>First Name</Text>
+                    <View style={styles.action}>
+                        <MaterialCommunityIcons name="format-letter-case" size={24} color="#05375a" />
+                        <TextInput
+                            placeholder='Your First Name'
+                            style={styles.textInput}
+                            autoCapitalize='none'
+                        />
+                    </View>
 
-                <Text style={[styles.text_footer, { marginTop: 35 }]}>Phone Number</Text>
-                <View style={styles.action}>
-                <FontAwesome name="mobile-phone" size={28} color="#05375a" />
-                    <TextInput
-                        placeholder='Your Phone Number'
-                        style={styles.textInput}
-                        autoCapitalize='none'
-                        onChangeText={(nameValue => nameInputChange(nameValue))}
-                        keyboardType='number-pad'
-                    />
-                </View>
+                    <Text style={[styles.text_footer, { marginTop: 35 }]}>Last Name</Text>
+                    <View style={styles.action}>
+                        <MaterialCommunityIcons name="format-letter-case" size={24} color="#05375a" />
+                        <TextInput
+                            placeholder='Your Last Name'
+                            style={styles.textInput}
+                            autoCapitalize='none'
+                        />
+                    </View>
+
+                    <Text style={[styles.text_footer, { marginTop: 35 }]}>Phone Number</Text>
+                    <View style={styles.action}>
+                        <FontAwesome name="mobile-phone" size={28} color="#05375a" />
+                        <TextInput
+                            placeholder='Your Phone Number'
+                            style={styles.textInput}
+                            autoCapitalize='none'
+                            keyboardType='number-pad'
+                        />
+                    </View>
 
 
-                <Text style={[styles.text_footer, {marginTop:35}]}>Email</Text>
-                <View style={styles.action}>
-                    <Feather name="mail" size={20} color="#05375a" />
-                    <TextInput
-                        placeholder='Your Email'
-                        style={styles.textInput}
-                        autoCapitalize='none'
-                        onChangeText={(textValue => textInputChange(textValue))}
-                        keyboardType='email-address'
+                    <Text style={[styles.text_footer, { marginTop: 35 }]}>Email</Text>
+                    <View style={styles.action}>
+                        <Feather name="mail" size={20} color="#05375a" />
+                        <TextInput
+                            placeholder='Your Email'
+                            style={styles.textInput}
+                            autoCapitalize='none'
+                            onChangeText={(textValue => textInputChange(textValue))}
+                            keyboardType='email-address'
 
-                    />
-                    {data.checkTextInputChange && data.email.includes('@') && data.email.includes('.com') ?
-                        <Animatable.View
-                            animation='bounceIn'
-                        >
+                        />
+                        {data.checkTextInputChange && data.email.includes('@') && data.email.includes('.com') ?
+                            <Animatable.View
+                                animation='bounceIn'
+                            >
+                                <Feather
+                                    name='check-circle'
+                                    color='green'
+                                    size={20}
+                                />
+                            </Animatable.View>
+                            :
                             <Feather
-                                name='check-circle'
-                                color='green'
-                                size={20}
-                            />
-                        </Animatable.View>
-                        :
-                        <Feather
                                 name='x-circle'
                                 color='red'
                                 size={20}
                             />
-                    }
-                </View>
-                <Text style={[styles.text_footer, { marginTop: 35 }]}>Password</Text>
-                <View style={styles.action}>
-                    <Feather name="lock" size={20} color="#05375a" />
-                    <TextInput
-                        placeholder='Your Password'
-                        style={styles.textInput}
-                        autoCapitalize='none'
-                        secureTextEntry={data.secureTextEntry ? true : false}
-                        onChangeText={(textValue => passwordInputChange(textValue))}
-                    />
-                    <TouchableOpacity onPress={updateSecureTextEntry}>
-                        <Feather
-                            name={data.secureTextEntry ? 'eye-off' : 'eye'}
-                            color='gray'
-                            size={20}
+                        }
+                    </View>
+                    <Text style={[styles.text_footer, { marginTop: 35 }]}>Password</Text>
+                    <View style={styles.action}>
+                        <Feather name="lock" size={20} color="#05375a" />
+                        <TextInput
+                            placeholder='Your Password'
+                            style={styles.textInput}
+                            autoCapitalize='none'
+                            secureTextEntry={data.secureTextEntry ? true : false}
+                            onChangeText={(textValue => passwordInputChange(textValue))}
                         />
+                        <TouchableOpacity onPress={updateSecureTextEntry}>
+                            <Feather
+                                name={data.secureTextEntry ? 'eye-off' : 'eye'}
+                                color='gray'
+                                size={20}
+                            />
+                        </TouchableOpacity>
+                    </View>
+
+
+
+
+
+                    <TouchableOpacity onPress={signHandler} style={styles.button}>
+                        <LinearGradient
+                            colors={['#08d4c4', '#01ab9d']}
+                            style={styles.signIn}
+                        >
+                            {isFetching ?
+
+                                <ActivityIndicator size='large' color='#fff' />
+
+                                :
+                                <Text style={styles.textSign, { color: '#fff' }}>
+                                    Sign Up
+                            </Text>
+                            }
+                        </LinearGradient>
                     </TouchableOpacity>
-                </View>
 
-
-
-
-                <TouchableOpacity style={styles.button}>
-                    <LinearGradient
-                        colors={['#08d4c4', '#01ab9d']}
-                        style={styles.signIn}
-                    >
-                        <Text style={styles.textSign, { color: '#fff' }}>
-                            Sign Up
-                        </Text>
-                    </LinearGradient>
-
-                </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('Signin')}
                         style={[styles.signIn, {

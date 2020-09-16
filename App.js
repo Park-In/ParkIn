@@ -9,6 +9,7 @@ import * as registerForPushNotificationsAsync from './helper/notifications.js';
 import { createStore, combineReducers, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import ReduxThunk from 'redux-thunk';
+import * as Notifications from 'expo-notifications';
 
 import parkinReducer from './store/reducers/parkin.js';
 
@@ -20,9 +21,11 @@ const store = createStore(rootReducer, applyMiddleware(ReduxThunk))
 
 export default function App() {
 
-  useEffect(() =>{
-    registerForPushNotificationsAsync.registerForPushNotificationsAsync();
-  });
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const url = response;
+    });
+  },[Notifications])
 
   return (
      <Provider store={store}>

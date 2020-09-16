@@ -47,7 +47,6 @@ export default (state = initialState, action) => {
                 }
             })
         case 'FETCH_USERS':
-            // console.log('action users', action.users);
             let usersArr = [];
             for (const user in action.users) {
                 usersArr.push({
@@ -64,7 +63,6 @@ export default (state = initialState, action) => {
                 users: usersArr
             })
         case 'FETCH_PARKS':
-            // console.log('action users', action.users);
             let parksArr = [];
             for (const park in action.parks) {
                 parksArr.push({
@@ -77,7 +75,6 @@ export default (state = initialState, action) => {
                 parks: parksArr
             })
         case 'FETCH_GEO':
-            // console.log('action users', action.users);
             return ({
                 ...state,
                 searchGeo: action.searchGeo

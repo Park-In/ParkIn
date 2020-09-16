@@ -8,7 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as parkinActions from '../store/actions/parkin.js'
 import { useSelector } from 'react-redux';
 
-const GOOGLE_PLACES_API_KEY = 'AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE'; // never save your real api key in a snack!
+const GOOGLE_PLACES_API_KEY = 'AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE'; // we will be deactivating the key after development
 
 const App = (props) => {
     const [revLocation, setRevLocation] = useState({});
@@ -19,13 +19,8 @@ const App = (props) => {
     useEffect(() => {
         const afunc = async () => {
             try {
-                console.log(geoData);
                 let placeTitle = geoData.description;
-                console.log(placeTitle, 'placeTitle');
-                console.log(typeof placeTitle, 'placeTitleType');
                 const placeTitleTransformed = replaceAllChar(placeTitle);
-                // const placeTitleTransformed = placeTitle.replaceAll(' ', '20%').replaceAll(',', '');
-                console.log(placeTitleTransformed);
 
                 const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${placeTitleTransformed}&key=AIzaSyCqe0-6gegfRy-yIpJY8Z47ASajUQ8qbZE`;
 
@@ -33,11 +28,8 @@ const App = (props) => {
                 const geoRes = await rawGeoPlace.json()
                 setRevGeoData(geoRes);
                 setRevGeoData(geoRes.results[0].geometry.location);
-                // console.log(geoRes);
-                console.log('results', geoRes.results[0].geometry.location);
                 props.isSearchClicked(geoRes.results[0].geometry.location)
             } catch (err) {
-                console.log(err)
             }
         }
         afunc();
@@ -64,7 +56,7 @@ const App = (props) => {
         <GooglePlacesAutocomplete
             query={{
                 key: GOOGLE_PLACES_API_KEY,
-                language: 'en', // language of the results
+                language: 'en',
                 components: 'country:jo',
             }}
             onPress={(data, details = null) => { setGeoData(data) }}
@@ -109,18 +101,6 @@ const App = (props) => {
 
             }}
         >
-
-            {/* <TouchableOpacity style={styles.button} onPress={() => { props.isSearchClicked(revGeoData) }}>
-                <LinearGradient
-                    colors={['#08d4c4', '#01ab9d']}
-                    style={styles.signIn}
-                >
-                    <Text style={styles.textSign, { color: '#fff' }}>
-                        Find Parks
-                        </Text>
-                </LinearGradient>
-
-            </TouchableOpacity> */}
         </GooglePlacesAutocomplete>
 
     );
@@ -134,14 +114,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: Constants.statusBarHeight,
         backgroundColor: '#ecf0f1',
-        // padding: 8,
-    },
-
-    button: {
-        // width: '50%',
-        // alignItems: 'center',
-        // marginTop: 50,
-        // position:'absolute',
     },
     signIn: {
         height: 38,

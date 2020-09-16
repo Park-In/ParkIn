@@ -129,7 +129,7 @@ const SignUpScreen = () => {
                             placeholder='Your First Name'
                             style={styles.textInput}
                             autoCapitalize='none'
-                            onChangeText={(nameValue => nameInputChange(nameValue))}
+                            // onChangeText={(nameValue => nameInputChange(nameValue))}
                         />
                     </View>
 
@@ -140,7 +140,7 @@ const SignUpScreen = () => {
                             placeholder='Your Last Name'
                             style={styles.textInput}
                             autoCapitalize='none'
-                            onChangeText={(nameValue => nameInputChange(nameValue))}
+                            // onChangeText={(nameValue => nameInputChange(nameValue))}
                         />
                     </View>
 
@@ -151,7 +151,7 @@ const SignUpScreen = () => {
                             placeholder='Your Phone Number'
                             style={styles.textInput}
                             autoCapitalize='none'
-                            onChangeText={(nameValue => nameInputChange(nameValue))}
+                            // onChangeText={(nameValue => nameInputChange(nameValue))}
                             keyboardType='number-pad'
                         />
                     </View>

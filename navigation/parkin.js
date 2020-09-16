@@ -17,12 +17,6 @@ const RootStack = createDrawerNavigator();
 
 function MyDrawer(props) {
 
-    // const DrawerComp = <Drawer.Navigator >
-    //                     <Drawer.Screen name='Auth' component={AuthScreen}/>
-    //                     <Drawer.Screen name='Map' component={MapScreen}/>
-    //                     <Drawer.Screen name='Profike' component={ProfileScreen} />
-    //                 </Drawer.Navigator>
-
     return (
 
         <Drawer.Navigator drawerContent={props => <DrawerContent {...props}/>}>
@@ -33,14 +27,6 @@ function MyDrawer(props) {
             <Drawer.Screen name='Map' component={MapScreen} />
             <Drawer.Screen name='Profile' component={ProfileScreen} />
         </Drawer.Navigator>
-        // <DrawerComp />
-        // <RootStack.Navigator>
-        //     {!location ?
-        //     <RootStack.Screen name='Auth' component={}/>
-        //     :
-        //     <RootStack.Screen name='Main' component={}/>
-        //     }
-        // </RootStack.Navigator>
     )
 }
 

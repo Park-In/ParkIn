@@ -11,7 +11,6 @@ import {Provider} from 'react-redux';
 import ReduxThunk from 'redux-thunk';
 import * as Notifications from 'expo-notifications';
 
-
 import parkinReducer from './store/reducers/parkin.js';
 
 const rootReducer = combineReducers({

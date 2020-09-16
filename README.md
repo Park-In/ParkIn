@@ -57,6 +57,11 @@
   - npm i
   - npm run
 
+  Alternativly
+
+  - Visit https://expo.io/@tommalieh/ParkIn
+  - Scan the code in the website using your expo application
+
 * Application Screens 
 ![splash.jpg](./assets/splash.jpg)
 ![signup.jpg](./assets/signup.jpg)
